@@ -38,7 +38,7 @@ type SquadTemplate struct {
 	TemplateName string
 	TemplateType string
 
-	CreatedByUser User    `gorm:"foreignKey:CreatedBy"`
+	CreatedByUser User    `gorm:"foreignKey:CreatedBy" json:"-"`
 	Squads        []Squad `gorm:"foreignKey:TemplateID"`
 }
 
@@ -49,7 +49,7 @@ type Squad struct {
 	SquadWeightGAC float64
 	SquadWeightTW  float64
 
-	Template SquadTemplate `gorm:"foreignKey:TemplateID"`
+	Template SquadTemplate `gorm:"foreignKey:TemplateID" json:"-"`
 	Units    []SquadUnit   `gorm:"foreignKey:SquadID"`
 }
 
@@ -61,5 +61,5 @@ type SquadUnit struct {
 	UnitOrder      int
 	PriorityNumber int
 
-	Squad Squad `gorm:"foreignKey:SquadID"`
+	Squad Squad `gorm:"foreignKey:SquadID" json:"-"`
 }
