@@ -4,10 +4,12 @@ import (
 	"dnj-backend/database"
 	"dnj-backend/models"
 	"dnj-backend/utils"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func RegisterUser(c *gin.Context) {
@@ -20,10 +22,15 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	existingUser := models.User{}
-	if err := database.DB.Where("username = ? OR email = ?", data.Username, data.Email).First(&existingUser).Error; err == nil {
+	err := database.DB.Where("username = ? OR email = ?", data.Username, data.Email).First(&existingUser).Error
+	if err == nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"error": "Username or email already exists",
 		})
+		return
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to validate user"})
 		return
 	}
 

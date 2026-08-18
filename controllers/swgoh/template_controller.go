@@ -172,8 +172,8 @@ func DeleteTemplate(c *gin.Context) {
 		return
 	}
 
-	var template models.SquadTemplate
-	err := database.DB.Where("created_by = ? AND template_name = ?", user.ID, dto.TemplateName).First(&template).Error
+	var templateToDelete models.SquadTemplate
+	err := database.DB.Preload("Squads.Units").Where("created_by = ? AND template_name = ?", user.ID, dto.TemplateName).First(&templateToDelete).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(404, gin.H{"error": "Template not found"})
 		return
@@ -182,17 +182,19 @@ func DeleteTemplate(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("template_id = ?", template.ID).Delete(&models.SquadUnit{}).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to delete squad units"})
-		return
+	for _, squad := range templateToDelete.Squads {
+		if err := database.DB.Where("squad_id = ?", squad.ID).Delete(&models.SquadUnit{}).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Failed to delete squad units"})
+			return
+		}
+
+		if err := database.DB.Delete(&squad).Error; err != nil {
+			c.JSON(500, gin.H{"error": "Failed to delete squad"})
+			return
+		}
 	}
 
-	if err := database.DB.Where("template_id = ?", template.ID).Delete(&models.Squad{}).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to delete squads"})
-		return
-	}
-
-	if err := database.DB.Delete(&template).Error; err != nil {
+	if err := database.DB.Delete(&templateToDelete).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to delete template"})
 		return
 	}
@@ -214,7 +216,14 @@ func FetchTemplates(c *gin.Context) {
 	}
 
 	var templates []models.SquadTemplate
-	if err := database.DB.Preload("Squads.Units").Where("created_by = ?", user.ID).Find(&templates).Error; err != nil {
+	if err := database.DB.
+		Preload("Squads", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "created_at", "updated_at", "deleted_at", "squad_name", "template_id", "squad_weight_gac", "squad_weight_tw")
+		}).
+		Preload("Squads.Units", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "created_at", "updated_at", "deleted_at", "squad_id", "character_id", "unit_weight", "unit_order", "priority_number")
+		}).
+		Where("created_by = ?", user.ID).Find(&templates).Error; err != nil {
 		c.JSON(500, gin.H{"error": "Failed to fetch templates"})
 		return
 	}
