@@ -1,0 +1,17 @@
+# Binaries
+main
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+*.out
+*.test
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
