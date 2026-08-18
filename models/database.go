@@ -6,13 +6,13 @@ import "gorm.io/gorm"
 
 type Role struct {
 	gorm.Model
-	RoleName string `gorm:"uniqueIndex"`
+	RoleName string
 }
 
 type User struct {
 	gorm.Model
-	Username  string `gorm:"uniqueIndex"`
-	Email     string `gorm:"uniqueIndex"`
+	Username  string
+	Email     string
 	Password  string
 	DiscordID string
 	RoleID    uint
@@ -34,8 +34,8 @@ type Portfolio struct {
 
 type SquadTemplate struct {
 	gorm.Model
-	CreatedBy    uint   `gorm:"uniqueIndex:idx_template_name_created_by"`
-	TemplateName string `gorm:"uniqueIndex:idx_template_name_created_by"`
+	CreatedBy    uint
+	TemplateName string
 	TemplateType string
 
 	CreatedByUser User    `gorm:"foreignKey:CreatedBy"`

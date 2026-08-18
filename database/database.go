@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 var DB *gorm.DB
@@ -44,12 +43,18 @@ func Migrate(db *gorm.DB) {
 }
 
 func _prepareRole(db *gorm.DB) error {
-	var roles = []models.Role{
-		{RoleName: "admin"},
-		{RoleName: "user"},
+	for _, roleName := range []string{"admin", "user"} {
+		var role models.Role
+		err := db.Where("role_name = ?", roleName).First(&role).Error
+		if err == nil {
+			continue
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
+		if err := db.Create(&models.Role{RoleName: roleName}).Error; err != nil {
+			return err
+		}
 	}
-	return db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "role_name"}},
-		DoNothing: true,
-	}).Create(&roles).Error
+	return nil
 }
