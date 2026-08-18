@@ -16,7 +16,7 @@ func registerSWGoHRoutes(router *gin.Engine) {
 		grandivory.GET("fetch-characters", swgoh.FetchAllCharacters)
 		grandivory.GET("fetch-character", swgoh.FetchAllCharacters)
 	}
-	modTools := route.Group("mod-template")
+	modTools := route.Group("squad-template")
 	{
 		modTools.POST("", middleware.MustLogin(), swgoh.SaveTemplate)
 		modTools.DELETE("", middleware.MustLogin(), swgoh.DeleteTemplate)
