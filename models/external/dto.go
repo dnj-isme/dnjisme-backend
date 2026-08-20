@@ -2,7 +2,7 @@ package external
 
 type FetchPlayerDto struct {
 	Action  string             `json:"action,omitempty"` // checksubscription or getprofile
-	Payload FetchPlayerPayload `json:"payload,omitempty"`
+	Payload FetchPlayerPayload `json:"payload,omitzero"`
 }
 
 type FetchPlayerPayload struct {
