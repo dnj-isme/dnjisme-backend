@@ -12,13 +12,19 @@ type LoginUserDto struct {
 }
 
 type PlayerDataResponse struct {
-	Allycode             string   `json:"allycode"`
-	Username             string   `json:"username"`
-	GuildName            string   `json:"guildName"`
-	RelicCharacterIds    []string `json:"relicCharacterIds"`
-	Gear12CharacterIds   []string `json:"gear12CharacterIds"`
-	NonRelicCharacterIds []string `json:"nonRelicCharacterIds"`
-	CharacterIds         []string `json:"characterIds"`
+	Allycode           string                    `json:"allycode"`
+	Username           string                    `json:"username"`
+	GuildName          string                    `json:"guildName"`
+	RelicCharacters    []SimplifiedCharacterData `json:"relicCharacterIds"`
+	Gear12Characters   []SimplifiedCharacterData `json:"gear12CharacterIds"`
+	NonRelicCharacters []SimplifiedCharacterData `json:"nonRelicCharacterIds"`
+	Characters         []SimplifiedCharacterData `json:"characters"`
+}
+
+type SimplifiedCharacterData struct {
+	BaseID    string `json:"baseId"`
+	Name      string `json:"name"`
+	BaseImage string `json:"baseImage"`
 }
 
 type SaveTemplateDto struct {
